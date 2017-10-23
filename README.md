@@ -22,7 +22,7 @@ Project is the main directory that you will hook SF Toolbox with.
 * panels: list of panels that the project contains
 * actions: list of actions that the project contains
 * content: list of content that the project contains
-
+* icon: icon for the project relative to project directory
  
 ## Actions
 
@@ -33,7 +33,8 @@ Action will trigger functionality that you hookup, you can run python code, call
  * idname: unique id that identifies this action
  * label: label that you want to show in the ui
  * description: what does the action do (will be shown in tooltips and statustips)
- * type: type of the action this can be python_code, python_function, ... 
+ * type: type of the action this can be python_code, python_function, ...
+ * icon: icon for the action relative to project directory 
  
  Following types for actions are available
  
@@ -64,3 +65,4 @@ Panel will be presented as widget, panels can contain panels and can be viewed i
 * actions: list of actions that the panel contains
 * panels: list of panels that the panel contains
 * content: list of content that the panel contains 
+* icon: icon for the panel relative to project directory
