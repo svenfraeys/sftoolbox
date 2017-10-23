@@ -10,14 +10,18 @@ panels:
           hello:
             type: python_code
             code: 'print "Hello !"'
+            icon: icons/uk.png
           bonjour:
             type: python_code
             code: 'print "Bonjour !"'
+            icon: icons/be.png
           hallo:
             type: python_code
             code: 'print "Hallo !"'
+            icon: icons/be.png
           guten.tag:
             type: python_code
+            icon: icons/du.png
             code: 'print "Guten Dag !"'
         panels:
           latin:
@@ -32,6 +36,7 @@ panels:
                 type: python_function
                 filepath: scripts/latin.py
                 function: say_hello
+                icon: icons/it.png
                 args: ['IT']
               bonjour2:
                 label: Bonjour
