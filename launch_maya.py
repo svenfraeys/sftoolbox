@@ -34,6 +34,8 @@ def main(args):
 
     from sftoolbox.project import Project
     from sftoolboxmaya.widgets import MayaProjectWidget
+    from sftoolboxmax import actions
+    assert actions
 
     if namespace.project:
         project = Project(namespace.project)
