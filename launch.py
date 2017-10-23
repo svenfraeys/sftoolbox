@@ -14,7 +14,7 @@ def main(args):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--project')
-    parser.add_argument('--live')
+    parser.add_argument('--live', action='store_true', default=False)
     app = qtgui.QApplication([])
 
     namespace = parser.parse_args(args)
@@ -23,7 +23,7 @@ def main(args):
         project = Project(namespace.project)
 
     w = ProjectWidget(project)
-    w.live_edit = True
+    w.live_edit = namespace.live
 
     w.show()
 

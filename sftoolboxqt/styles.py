@@ -1,3 +1,6 @@
+import functools
+
+from sftoolbox.content import ActionContent, PanelContent
 from sftoolboxqt import qtgui
 from sftoolboxqt import engine
 
@@ -8,8 +11,9 @@ class GridStyle(qtgui.QWidget):
     """
     json_type = 'grid'
 
-    def __init__(self, parent=None):
+    def __init__(self, panel, parent=None):
         super(GridStyle, self).__init__(parent=parent)
+        self.panel = panel
         self.item_count = 0
         self.max_lines = 3
         self.row = 0
@@ -21,9 +25,10 @@ class GridStyle(qtgui.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-    def add_content_widget(self, content_widget):
-        """add the content
-        """
+    def add_content(self, content, show_icons=True, show_text=True):
+        from sftoolboxqt.widgets import ContentWidget
+        content_widget = ContentWidget(content, show_icons, show_text)
+
         if self.direction == 'vertical':
             self.layout().addWidget(content_widget, self.row, self.column)
         else:
@@ -41,16 +46,17 @@ class HorizontalStyle(qtgui.QWidget):
     """
     json_type = 'horizontal'
 
-    def __init__(self, parent=None):
+    def __init__(self, panel, parent=None):
         super(HorizontalStyle, self).__init__(parent=parent)
+        self.panel = panel
         layout = qtgui.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-    def add_content_widget(self, content_widget):
-        """add the content
-        """
+    def add_content(self, content, show_icons=True, show_text=True):
+        from sftoolboxqt.widgets import ContentWidget
+        content_widget = ContentWidget(content, show_icons, show_text)
         self.layout().addWidget(content_widget)
 
 
@@ -60,20 +66,77 @@ class VerticalStyle(qtgui.QWidget):
     """
     json_type = 'vertical'
 
-    def __init__(self, parent=None):
+    def __init__(self, panel, parent=None):
         super(VerticalStyle, self).__init__(parent=parent)
+        self.panel = panel
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-    def add_content_widget(self, content_widget):
-        """add the content
-        """
+    def add_content(self, content, show_icons=True, show_text=True):
+        from sftoolboxqt.widgets import ContentWidget
+        content_widget = ContentWidget(content, show_icons, show_text)
         self.layout().addWidget(content_widget)
 
 
-def create_style(style_type, args=None, kwargs=None):
+@engine.register_style_class
+class DropdownStyle(qtgui.QWidget):
+    """horizontal layout system
+    """
+    json_type = 'dropdown'
+
+    def __init__(self, panel, parent=None):
+        super(DropdownStyle, self).__init__(parent=parent)
+        self.panel = panel
+        self._content = []
+        self._menu = qtgui.QMenu()
+        self._menu.aboutToShow.connect(self._handle_about_to_show)
+
+        self._button = qtgui.QPushButton(self.panel.human_label)
+        self._button.setMenu(self._menu)
+
+        layout = qtgui.QVBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
+        layout.addWidget(self._button)
+
+    def add_content(self, content, show_icons=True, show_text=True):
+        self._content.append(content)
+
+    def _handle_run_action(self, action):
+        """handle running the action
+        """
+        if action.is_runnable:
+            action.run()
+
+    def _inject_content(self, menu, content_list):
+        """add given content to the menu
+        """
+        for content in content_list:
+            if isinstance(content, ActionContent):
+                action = content.target_action
+                q_action = qtgui.QAction(self)
+                q_action.setText(action.human_label)
+                q_action.setToolTip(action.description)
+                q_action.setStatusTip(action.description)
+                q_action.triggered.connect(functools.partial(self._handle_run_action, action))
+                menu.addAction(q_action)
+            elif isinstance(content, PanelContent):
+                panel = content.target_panel
+                sub_menu = qtgui.QMenu(panel.human_label)
+                self._inject_content(sub_menu, panel.content)
+                menu.addMenu(sub_menu)
+
+    def _handle_about_to_show(self):
+        """populate the menu
+        """
+        self._menu.clear()
+        self._inject_content(self._menu, self._content)
+
+
+def create_style(style_type, panel, args=None, kwargs=None):
     """create a style with the given name
     """
     for class_ in engine.style_classes_register:
@@ -83,4 +146,4 @@ def create_style(style_type, args=None, kwargs=None):
             if not kwargs:
                 kwargs = {}
 
-            return class_(*args, **kwargs)
+            return class_(panel, *args, **kwargs)

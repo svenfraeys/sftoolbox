@@ -41,7 +41,9 @@ class Action(object):
 
     @classmethod
     def from_json(cls, project, data):
-        raise NotImplemented
+        action = Action(project)
+        action._apply_json(data)
+        return action
 
     def run(self):
         """run the given action
@@ -205,3 +207,5 @@ def from_json(project, value):
     for class_ in sftoolbox.engine.action_classes_register:
         if json_type == class_.json_type:
             return class_.from_json(project, value)
+
+    return Action.from_json(project, value)

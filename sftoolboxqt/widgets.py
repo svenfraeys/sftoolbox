@@ -144,7 +144,7 @@ class PanelWidget(qtgui.QWidget):
         super(PanelWidget, self).__init__(parent=parent)
         self.panel = panel
 
-        self.style = create_style(panel.style)
+        self.style = create_style(panel.style, panel)
 
         layout = qtgui.QVBoxLayout()
 
@@ -162,9 +162,7 @@ class PanelWidget(qtgui.QWidget):
             self.setStatusTip(self.panel.description)
 
             for content in self.panel.content:
-                content_widget = ContentWidget(content, self.panel.show_icons,
-                                               self.panel.show_text)
-                self.style.add_content_widget(content_widget)
+                self.style.add_content(content, show_icons=self.panel.show_icons, show_text=self.panel.show_text)
 
 
 class MainPanelWidget(PanelWidget):
@@ -297,6 +295,19 @@ class ProjectWidget(qtgui.QWidget):
         action.triggered.connect(self.close)
         return action
 
+    def _create_live_edit_action(self):
+        """create a close action
+        """
+        action = qtgui.QAction(self)
+        action.setText("Live Edit")
+        action.triggered.connect(self._handle_live_edit)
+        return action
+
+    def _handle_live_edit(self):
+        """handle toggle of live edit
+        """
+        self.live_edit = not self.live_edit
+
     def _show_about_tool_box(self):
         """show about toolbox
         """
@@ -344,6 +355,10 @@ class ProjectWidget(qtgui.QWidget):
     @live_edit.setter
     def live_edit(self, value):
         self._live_edit = value
+        if value:
+            self._live_thread.start()
+        else:
+            self._live_thread.terminate()
 
     def _do_update(self, value):
         new_project = Project(value)
@@ -351,16 +366,13 @@ class ProjectWidget(qtgui.QWidget):
 
     def __init__(self, project=None, parent=None):
         super(ProjectWidget, self).__init__(parent=parent)
-        self._project = project
+        self._project = None
         self._live_edit = False
         self._active_panel = None
         self._live_thread = ReloadProjectThread()
-        if self._project:
-            self._live_thread.project_directory = self._project.directory
 
         self._live_thread.project_changed.connect(self._do_update)
-        self._live_thread.start()
-
+        self._live_edit_action = self._create_live_edit_action()
         self._about_action = self._create_about_action()
         self._open_project_action = self._create_open_project_action()
         self._close_project_action = self._create_close_project_action()
@@ -375,7 +387,10 @@ class ProjectWidget(qtgui.QWidget):
         file_menu.addAction(self._reload_action)
         file_menu.addSeparator()
         file_menu.addAction(self._close_action)
-        self.panels_menu = menu.addMenu('Panels')
+
+        tools_menu = menu.addMenu('Tools')
+        tools_menu.addAction(self._live_edit_action)
+        self.panels_menu = tools_menu.addMenu('Panels')
         help_menu = menu.addMenu('Help')
         help_menu.addAction(self._about_action)
         help_menu.addSeparator()
@@ -392,5 +407,9 @@ class ProjectWidget(qtgui.QWidget):
         layout.addWidget(menu)
         layout.addWidget(self._scroll_area)
 
-        # set the active panel
-        self._refresh_content()
+        # set the project which will trigger the refresh
+        self.project = project
+
+    def closeEvent(self, event):
+        self._live_thread.terminate()
+        event.accept()
