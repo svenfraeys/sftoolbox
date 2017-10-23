@@ -421,3 +421,6 @@ class ProjectWidget(qtgui.QWidget):
     def closeEvent(self, event):
         self._live_thread.terminate()
         event.accept()
+
+    def sizeHint(self):
+        return qtcore.QSize(250, 300)

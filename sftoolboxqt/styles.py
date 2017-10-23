@@ -121,7 +121,8 @@ class DropdownStyle(qtgui.QWidget):
                 q_action.setText(action.human_label)
                 q_action.setToolTip(action.description)
                 q_action.setStatusTip(action.description)
-                q_action.triggered.connect(functools.partial(self._handle_run_action, action))
+                q_action.triggered.connect(
+                    functools.partial(self._handle_run_action, action))
                 menu.addAction(q_action)
             elif isinstance(content, PanelContent):
                 panel = content.target_panel
@@ -139,11 +140,13 @@ class DropdownStyle(qtgui.QWidget):
 def create_style(style_type, panel, args=None, kwargs=None):
     """create a style with the given name
     """
+    if not args:
+        args = []
+    if not kwargs:
+        kwargs = {}
+
     for class_ in engine.style_classes_register:
         if class_.json_type == style_type:
-            if not args:
-                args = []
-            if not kwargs:
-                kwargs = {}
-
             return class_(panel, *args, **kwargs)
+
+    return VerticalStyle(panel, *args, **kwargs)

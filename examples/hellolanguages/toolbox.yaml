@@ -1,0 +1,41 @@
+name: Hello Tools
+version: v1
+description: |
+  This is a tool that will say hello to you in many languages
+panels:
+  main:
+    panels:
+      benelux:
+        actions:
+          hello:
+            type: python_code
+            code: 'print "Hello !"'
+          bonjour:
+            type: python_code
+            code: 'print "Bonjour !"'
+          hallo:
+            type: python_code
+            code: 'print "Hallo !"'
+          guten.tag:
+            type: python_code
+            code: 'print "Guten Dag !"'
+        panels:
+          latin:
+            style: dropdown
+            actions:
+              ola:
+                type: python_function
+                filepath: scripts/latin.py
+                function: say_hello
+                args: ['ESP']
+              ciao:
+                type: python_function
+                filepath: scripts/latin.py
+                function: say_hello
+                args: ['IT']
+              bonjour2:
+                label: Bonjour
+                type: python_function
+                filepath: scripts/latin.py
+                function: say_hello
+                args: ['IT']
