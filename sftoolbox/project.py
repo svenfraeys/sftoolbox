@@ -108,3 +108,10 @@ class Project(object):
             self.active_panel_idname = value.idname
         else:
             self.active_panel_idname = None
+
+
+def is_valid_project_directory(directory):
+    """check if the given directory is a toolbox project or not
+    """
+    if not os.path.exists(os.path.join(directory, 'toolbox.yaml')):
+        return

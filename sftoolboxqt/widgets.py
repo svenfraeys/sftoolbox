@@ -162,7 +162,9 @@ class PanelWidget(qtgui.QWidget):
             self.setStatusTip(self.panel.description)
 
             for content in self.panel.content:
-                self.style.add_content(content, show_icons=self.panel.show_icons, show_text=self.panel.show_text)
+                self.style.add_content(content,
+                                       show_icons=self.panel.show_icons,
+                                       show_text=self.panel.show_text)
 
 
 class MainPanelWidget(PanelWidget):
@@ -253,9 +255,13 @@ class ProjectWidget(qtgui.QWidget):
     def _handle_open_project(self):
         """open a project
         """
-        directory = qtgui.QFileDialog.getExistingDirectory(self,
-                                                           "Select Project Directory...")
+        directory = qtgui.QFileDialog.getExistingDirectory(
+            self, "Select Project Directory...")
         if not directory:
+            return
+        if not sftoolbox.project.is_valid_project_directory(directory):
+            qtgui.QMessageBox.warning(self, 'Invalid Project',
+                                      'Given folder is not a valid project')
             return
         project = sftoolbox.project.Project(directory)
         self.project = project
@@ -281,7 +287,7 @@ class ProjectWidget(qtgui.QWidget):
     def _handle_reload(self):
         """handle reload
         """
-        if self.project:
+        if not self.project:
             return
 
         project = Project(self.project.directory)
@@ -301,6 +307,7 @@ class ProjectWidget(qtgui.QWidget):
         action = qtgui.QAction(self)
         action.setText("Live Edit")
         action.triggered.connect(self._handle_live_edit)
+        action.setCheckable(True)
         return action
 
     def _handle_live_edit(self):
@@ -355,6 +362,7 @@ class ProjectWidget(qtgui.QWidget):
     @live_edit.setter
     def live_edit(self, value):
         self._live_edit = value
+        self._live_edit_action.setChecked(value)
         if value:
             self._live_thread.start()
         else:
