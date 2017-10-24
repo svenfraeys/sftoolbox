@@ -10,9 +10,12 @@ modules = ['sftoolbox', 'sftoolboxmaya']
 sftoolbox_widgets = []
 
 
-def main(args):
+def main(args=None):
     """launch the tool for maya
     """
+    if not args:
+        args = []
+
     # pop all modules from cache for latest code
     map(sys.modules.pop, [key for key in sys.modules.keys()
                           if any([mod in key for mod in modules])])
@@ -34,7 +37,7 @@ def main(args):
 
     from sftoolbox.project import Project
     from sftoolboxmaya.widgets import MayaProjectWidget
-    from sftoolboxmax import actions
+    from sftoolboxmaya import actions
     assert actions
 
     if namespace.project:
@@ -43,3 +46,7 @@ def main(args):
     w = MayaProjectWidget(project)
     sftoolbox_widgets.append(w)
     w.show(dockable=True)
+
+
+if __name__ == '__main__':
+    main([])

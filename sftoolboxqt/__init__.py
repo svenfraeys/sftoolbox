@@ -23,7 +23,7 @@ if _qt_system == 'PySide':
 elif _qt_system == 'PySide2':
     import sftoolboxqt.qtguipyside2 as qtgui
 else:
-    raise NotImplementedError
+    raise ImportError
 
 # make qtcore available
 if _qt_system == 'PySide':
@@ -31,6 +31,8 @@ if _qt_system == 'PySide':
 elif _qt_system == 'PySide2':
     from PySide2 import QtCore as qtcore
 else:
-    raise NotImplementedError
+    raise ImportError
+assert qtcore
+assert qtgui
 
 engine = sftoolboxqt.engineinterface.Engine()

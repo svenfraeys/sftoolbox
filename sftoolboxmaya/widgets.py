@@ -26,6 +26,7 @@ class MayaProjectWidget(sftoolboxmaya.utils.DialogWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         self._toolbox_widget = ProjectWidget(project)
+        layout.addWidget(self._toolbox_widget)
         self.setWindowTitle(self._toolbox_widget.windowTitle())
 
         # wrap the set window title so we keep it in sync
