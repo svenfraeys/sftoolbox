@@ -1,6 +1,6 @@
 import shiboken2
 from maya import OpenMayaUI as mui
-from toolboxqt import qtgui
+from sftoolboxqt import qtgui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 
 

@@ -19,14 +19,14 @@ class ReloadProjectThread(qtcore.QThread):
 
     def __init__(self):
         super(ReloadProjectThread, self).__init__()
-        self.project_directory = None
+        self.filepath = None
         self.previous_hash = None
 
     @property
     def toolbox_yaml(self):
-        if not self.project_directory:
+        if not self.filepath:
             return ''
-        return os.path.join(self.project_directory, 'toolbox.yaml')
+        return os.path.join(self.filepath, 'toolbox.yaml')
 
     def run(self):
         import time
@@ -37,7 +37,7 @@ class ReloadProjectThread(qtcore.QThread):
                     self.toolbox_yaml)
                 if self.previous_hash != current_hash:
                     self.previous_hash = current_hash
-                    self.project_changed.emit(self.project_directory)
+                    self.project_changed.emit(self.filepath)
 
 
 class ActionWidget(qtgui.QWidget):
@@ -255,15 +255,11 @@ class ProjectWidget(qtgui.QWidget):
     def _handle_open_project(self):
         """open a project
         """
-        directory = qtgui.QFileDialog.getExistingDirectory(
-            self, "Select Project Directory...")
-        if not directory:
-            return
-        if not sftoolbox.project.is_valid_project_directory(directory):
-            qtgui.QMessageBox.warning(self, 'Invalid Project',
-                                      'Given folder is not a valid project')
-            return
-        project = sftoolbox.project.Project(directory)
+        filepath, accepted = qtgui.QFileDialog.getOpenFileName(
+            self, "Select Toolbox yaml file"
+        )
+
+        project = sftoolbox.project.Project(filepath)
         self.project = project
 
     def _create_about_action(self):
@@ -352,7 +348,7 @@ class ProjectWidget(qtgui.QWidget):
     def project(self, value):
         self._project = value
         if value:
-            self._live_thread.project_directory = value.directory
+            self._live_thread.filepath = value.filepath
         self._refresh_content()
 
     @property

@@ -12,13 +12,13 @@ class Project(object):
     """engine
     """
 
-    def __init__(self, directory=None):
+    def __init__(self, filepath=None):
         """engine collecting all information
         """
+        self.filepath = filepath
         self.name = None
         self.version = None
         self.description = None
-        self.directory = directory
         self.active_panel_idname = None
         self.about = ''
 
@@ -28,6 +28,10 @@ class Project(object):
         self._load_project()
 
     @property
+    def directory(self):
+        return os.path.basename(self.filepath)
+
+    @property
     def absolute_icon_filepath(self):
         if self.icon_filepath:
             return os.path.join(self.directory, self.icon_filepath)
@@ -35,9 +39,7 @@ class Project(object):
     def _load_project(self):
         """load in the project from the directory data
         """
-        yaml_filepath = os.path.join(self.directory, 'toolbox.yaml')
-
-        with open(yaml_filepath, 'r') as fp:
+        with open(self.filepath, 'r') as fp:
             data = yaml.load(fp)
 
         self.name = data.get('name')
@@ -114,4 +116,5 @@ def is_valid_project_directory(directory):
     """check if the given directory is a toolbox project or not
     """
     if not os.path.exists(os.path.join(directory, 'toolbox.yaml')):
-        return
+        return False
+    return True
