@@ -1,3 +1,4 @@
+import os
 import uuid
 import sftoolbox.utils
 
@@ -7,6 +8,8 @@ class Panel(object):
     """
 
     def __init__(self, project):
+        """construct the panel
+        """
         project.add(self)
         self.project = project
         self.label = None
@@ -15,6 +18,7 @@ class Panel(object):
         self.is_main_panel = False
         self.show_text = True
         self.show_icons = True
+        self.icon = None
         self.style = 'vertical'
 
     @property
@@ -43,7 +47,8 @@ class Panel(object):
             'is_main_panel': self.is_main_panel,
             'show_text': self.show_text,
             'show_icons': self.show_icons,
-            'style': self.style
+            'style': self.style,
+            'icon': self.icon
         }
 
     @classmethod
@@ -58,6 +63,7 @@ class Panel(object):
         panel.show_text = data.get('show_text', True)
         panel.show_icons = data.get('show_icons', True)
         panel.style = data.get('style', 'vertical')
+        panel.icon = data.get('icon')
         content = data.get('content')
 
         actions = data.get('actions')
@@ -68,11 +74,17 @@ class Panel(object):
                     action.setdefault('idname', idname)
                     action_list.append(action)
                 actions = action_list
+            elif isinstance(actions, basestring):
+                actions = [{'idname': actions}]
 
             for action in actions:
                 # import here for double import error
                 import sftoolbox.actions
                 import sftoolbox.content
+
+                if not isinstance(action, dict):
+                    action = {'idname': str(action)}
+
                 action = sftoolbox.actions.from_json(project, action)
                 content_i = sftoolbox.content.ActionContent(project)
                 content_i.panel = panel
@@ -100,6 +112,8 @@ class Panel(object):
                     panel_i.setdefault('idname', idname)
                     panel_list.append(panel_i)
                 panels = panel_list
+            elif isinstance(panels, basestring):
+                panels = [{'idname': panels}]
 
             for panel_data in panels:
                 # import here for double import error
@@ -110,6 +124,12 @@ class Panel(object):
                 content.target_panel = panel_i
 
         return panel
+
+    @property
+    def absolute_icon_filepath(self):
+        if not self.icon:
+            return None
+        return os.path.join(self.project.directory, self.icon)
 
     def __repr__(self):
         return '<Panel {0}>'.format(self.idname)

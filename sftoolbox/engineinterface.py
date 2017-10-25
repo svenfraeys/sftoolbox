@@ -3,6 +3,8 @@ class Engine(object):
     """
 
     def __init__(self):
+        """construct the engine
+        """
         self.action_classes_register = []
         self.content_classes_register = []
 

@@ -163,6 +163,7 @@ class PythonFunctionAction(Action):
 
     @property
     def is_runnable(self):
+
         if not self.absolute_filepath:
             return False
 
@@ -173,6 +174,7 @@ class PythonFunctionAction(Action):
     def run(self):
         """load the module and run the function
         """
+
         module_name = os.path.basename(self.absolute_filepath)
         module_name, _ = os.path.splitext(module_name)
         module_object = imp.load_source(module_name, self.absolute_filepath)

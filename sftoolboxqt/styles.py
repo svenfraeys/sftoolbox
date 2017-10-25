@@ -21,7 +21,6 @@ class GridStyle(qtgui.QWidget):
         self.direction = 'vertical'
 
         layout = qtgui.QGridLayout()
-        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
@@ -50,7 +49,6 @@ class HorizontalStyle(qtgui.QWidget):
         super(HorizontalStyle, self).__init__(parent=parent)
         self.panel = panel
         layout = qtgui.QHBoxLayout()
-        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
@@ -95,6 +93,7 @@ class DropdownStyle(qtgui.QWidget):
 
         self._button = qtgui.QPushButton(self.panel.human_label)
         self._button.setMenu(self._menu)
+        self._button.setIcon(qtgui.QIcon(self.panel.absolute_icon_filepath))
 
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)
@@ -118,9 +117,14 @@ class DropdownStyle(qtgui.QWidget):
             if isinstance(content, ActionContent):
                 action = content.target_action
                 q_action = qtgui.QAction(self)
-                q_action.setText(action.human_label)
+                if self.panel.show_text:
+                    q_action.setText(action.human_label)
                 q_action.setToolTip(action.description)
                 q_action.setStatusTip(action.description)
+                if self.panel.show_icons:
+                    if action.absolute_icon_filepath:
+                        q_action.setIcon(
+                            qtgui.QIcon(action.absolute_icon_filepath))
                 q_action.triggered.connect(
                     functools.partial(self._handle_run_action, action))
                 menu.addAction(q_action)

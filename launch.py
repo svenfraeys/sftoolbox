@@ -1,8 +1,7 @@
 """launch toolbox
 """
-import argparse
-
 import sys
+import argparse
 
 from sftoolboxqt import qtgui
 from sftoolbox.project import Project

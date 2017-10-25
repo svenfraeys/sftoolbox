@@ -22,22 +22,16 @@ class ReloadProjectThread(qtcore.QThread):
         self.filepath = None
         self.previous_hash = None
 
-    @property
-    def toolbox_yaml(self):
-        if not self.filepath:
-            return ''
-        return os.path.join(self.filepath, 'toolbox.yaml')
-
     def run(self):
         import time
         while True:
             time.sleep(1)
-            if os.path.exists(self.toolbox_yaml):
-                current_hash = sftoolbox.utils.get_hash_from_file(
-                    self.toolbox_yaml)
+            filepath = self.filepath or ''
+            if os.path.exists(filepath):
+                current_hash = sftoolbox.utils.get_hash_from_file(filepath)
                 if self.previous_hash != current_hash:
                     self.previous_hash = current_hash
-                    self.project_changed.emit(self.filepath)
+                    self.project_changed.emit(filepath)
 
 
 class ActionWidget(qtgui.QWidget):
@@ -230,6 +224,25 @@ class ProjectWidget(qtgui.QWidget):
         scroll_area.setFrameShape(qtgui.QFrame.NoFrame)
         return scroll_area
 
+    def _create_edit_project(self):
+        """return action to edit the project
+        """
+        action = qtgui.QAction(self)
+        action.setText('Edit Project...')
+        action.triggered.connect(self._handle_edit_project)
+        return action
+
+    def _handle_edit_project(self):
+        """edit the project
+        """
+        if not self.project:
+            print('no current project')
+            return
+
+        qtgui.QDesktopServices.openUrl(
+            qtcore.QUrl(self.project.filepath)
+        )
+
     def _create_open_project_action(self):
         """open project
         """
@@ -255,9 +268,13 @@ class ProjectWidget(qtgui.QWidget):
     def _handle_open_project(self):
         """open a project
         """
-        filepath, accepted = qtgui.QFileDialog.getOpenFileName(
-            self, "Select Toolbox yaml file"
+        filepath, _ = qtgui.QFileDialog.getOpenFileName(
+            self, "Select Toolbox yaml file",
+            filter="yaml (*.yaml);;All Files (*.*)"
         )
+
+        if not filepath:
+            return
 
         project = sftoolbox.project.Project(filepath)
         self.project = project
@@ -329,7 +346,7 @@ class ProjectWidget(qtgui.QWidget):
 
     def _refresh_content(self):
         if self.project:
-            self.setWindowTitle(self.project.name)
+            self.setWindowTitle(self.project.human_name)
             self.active_panel = self.project.active_panel
             icon_filepath = self.project.absolute_icon_filepath
             if icon_filepath and os.path.exists(icon_filepath):
@@ -339,6 +356,42 @@ class ProjectWidget(qtgui.QWidget):
             self.setWindowTitle('SF ToolBox')
             self.setWindowIcon(qtgui.QIcon())
             self.active_panel = None
+
+    def _create_new_project_action(self):
+        """return action that creates a new project
+        """
+        action = qtgui.QAction(self)
+        action.setText("New Project...")
+        action.triggered.connect(self._handle_new_project)
+        return action
+
+    def _handle_new_project(self):
+        """handle creating new projects
+        """
+        filepath, _ = qtgui.QFileDialog.getSaveFileName(
+            self, "Create new project", filter="yaml (*.yaml)")
+
+        if not filepath:
+            return
+
+        # write the project
+        open(filepath, 'w').close()
+
+        # load it
+        project = sftoolbox.project.Project(filepath)
+        self.project = project
+
+        qtgui.QDesktopServices.openUrl(qtcore.QUrl(self.project.filepath))
+
+        if not self.live_edit:
+            answer = qtgui.QMessageBox.information(
+                self, "Live Edit ?",
+                "Do you want to activate Live Edit ?\n"
+                "Toolbox will reload the GUI when you change the file",
+                qtgui.QMessageBox.Yes | qtgui.QMessageBox.No
+            )
+            if answer == qtgui.QMessageBox.Yes:
+                self.live_edit = True
 
     @property
     def project(self):
@@ -379,16 +432,21 @@ class ProjectWidget(qtgui.QWidget):
         self._live_edit_action = self._create_live_edit_action()
         self._about_action = self._create_about_action()
         self._open_project_action = self._create_open_project_action()
+        self._edit_project_action = self._create_edit_project()
         self._close_project_action = self._create_close_project_action()
         self._about_toolbox_action = self._create_about_toolbox_action()
+        self._new_project_action = self._create_new_project_action()
         self._reload_action = self._create_reload_action()
         self._close_action = self._create_close_action()
 
         menu = qtgui.QMenuBar()
         file_menu = menu.addMenu('File')
+        file_menu.addAction(self._new_project_action)
         file_menu.addAction(self._open_project_action)
         file_menu.addAction(self._close_project_action)
+        file_menu.addSeparator()
         file_menu.addAction(self._reload_action)
+        file_menu.addAction(self._edit_project_action)
         file_menu.addSeparator()
         file_menu.addAction(self._close_action)
 

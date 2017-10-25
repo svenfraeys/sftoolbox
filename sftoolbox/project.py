@@ -29,18 +29,30 @@ class Project(object):
 
     @property
     def directory(self):
-        return os.path.basename(self.filepath)
+        """open the directory
+        """
+        return os.path.dirname(self.filepath)
 
     @property
     def absolute_icon_filepath(self):
         if self.icon_filepath:
             return os.path.join(self.directory, self.icon_filepath)
 
+    @property
+    def human_name(self):
+        if self.name:
+            return self.name
+
+        return os.path.splitext(os.path.basename(self.filepath))[0]
+
     def _load_project(self):
         """load in the project from the directory data
         """
         with open(self.filepath, 'r') as fp:
             data = yaml.load(fp)
+
+        if data is None:
+            data = {}
 
         self.name = data.get('name')
         self.description = data.get('description')
@@ -57,6 +69,8 @@ class Project(object):
                 action.setdefault('idname', idname)
                 action_list.append(action)
             actions = action_list
+        elif isinstance(actions, basestring):
+            actions = [{'idname': actions}]
 
         for action_dict in actions:
             sftoolbox.actions.from_json(self, action_dict)
@@ -66,9 +80,13 @@ class Project(object):
         if isinstance(panels, dict):
             panel_list = []
             for idname, panel in panels.items():
+                if isinstance(panel, basestring):
+                    panel = {'idname': panel}
                 panel.setdefault('idname', idname)
                 panel_list.append(panel)
             panels = panel_list
+        elif isinstance(panels, basestring):
+            panels = [{'idname': panels}]
 
         if panels and not self.active_panel_idname:
             self.active_panel_idname = panels[0].get('idname')
