@@ -1,3 +1,5 @@
+"""different styles to show actions
+"""
 import functools
 
 from sftoolbox.content import ActionContent, PanelContent
