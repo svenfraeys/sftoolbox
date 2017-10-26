@@ -1,0 +1,12 @@
+sftoolbox changelog
+===================
+
+Here you can see the full list of changes between each sftoolbox release
+
+Version 0.1.0
+-------------
+
+Major release
+
+- first sftoolbox, sftoolboxmaya, sftoolboxqt and sftoolboxmax added
+- setup of project
