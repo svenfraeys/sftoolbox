@@ -1,12 +1,12 @@
 """widgets available for toolbox
 """
-import functools
 import os
 
 import sftoolbox
 import sftoolbox.content
 from sftoolbox.project import Project
 from sftoolboxqt import qtgui
+from sftoolboxqt import utils
 from sftoolboxqt import qtcore
 from sftoolboxqt.styles import create_style
 import sftoolbox.utils
@@ -141,6 +141,8 @@ class PanelWidget(qtgui.QWidget):
         self.style = create_style(panel.style, panel)
 
         layout = qtgui.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         layout.addWidget(self.style)
 
@@ -176,30 +178,6 @@ class MainPanelWidget(PanelWidget):
 class ProjectWidget(qtgui.QWidget):
     """toolbox main window
     """
-
-    def _handle_about_to_show_panels(self):
-        self.panels_menu.clear()
-        if not self.project:
-            return
-
-        for panel in self.project.panels:
-            if not panel.is_main_panel:
-                continue
-
-            action = qtgui.QAction(self)
-            action.setText(panel.human_label)
-            callback = functools.partial(self._set_active_panel, panel)
-            action.triggered.connect(callback)
-            self.panels_menu.addAction(action)
-
-            if self.active_panel == panel:
-                action.setCheckable(True)
-                action.setChecked(True)
-
-    def _set_active_panel(self, value):
-        self.project.active_panel = value
-        self.active_panel = self.project.active_panel
-
     @property
     def active_panel(self):
         return self._active_panel
@@ -238,10 +216,7 @@ class ProjectWidget(qtgui.QWidget):
         if not self.project:
             print('no current project')
             return
-
-        qtgui.QDesktopServices.openUrl(
-            qtcore.QUrl(self.project.filepath)
-        )
+        utils.open_with_default_program(self.project.filepath)
 
     def _create_open_project_action(self):
         """open project
@@ -303,7 +278,7 @@ class ProjectWidget(qtgui.QWidget):
         if not self.project:
             return
 
-        project = Project(self.project.directory)
+        project = Project(self.project.filepath)
         self.project = project
 
     def _create_close_action(self):
@@ -381,7 +356,7 @@ class ProjectWidget(qtgui.QWidget):
         project = sftoolbox.project.Project(filepath)
         self.project = project
 
-        qtgui.QDesktopServices.openUrl(qtcore.QUrl(self.project.filepath))
+        utils.open_with_default_program(self.project.filepath)
 
         if not self.live_edit:
             answer = qtgui.QMessageBox.information(
@@ -452,12 +427,10 @@ class ProjectWidget(qtgui.QWidget):
 
         tools_menu = menu.addMenu('Tools')
         tools_menu.addAction(self._live_edit_action)
-        self.panels_menu = tools_menu.addMenu('Panels')
         help_menu = menu.addMenu('Help')
         help_menu.addAction(self._about_action)
         help_menu.addSeparator()
         help_menu.addAction(self._about_toolbox_action)
-        self.panels_menu.aboutToShow.connect(self._handle_about_to_show_panels)
 
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)

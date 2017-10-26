@@ -49,7 +49,6 @@ class HorizontalStyle(qtgui.QWidget):
         super(HorizontalStyle, self).__init__(parent=parent)
         self.panel = panel
         layout = qtgui.QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):
@@ -68,8 +67,6 @@ class VerticalStyle(qtgui.QWidget):
         super(VerticalStyle, self).__init__(parent=parent)
         self.panel = panel
         layout = qtgui.QVBoxLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):
