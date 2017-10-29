@@ -24,10 +24,11 @@ class ReloadProjectThread(qtcore.QThread):
 
     def run(self):
         import time
+
         while True:
             time.sleep(1)
-            filepath = self.filepath or ''
-            if os.path.exists(filepath):
+            filepath = self.filepath
+            if filepath and os.path.exists(filepath):
                 current_hash = sftoolbox.utils.get_hash_from_file(filepath)
                 if self.previous_hash != current_hash:
                     self.previous_hash = current_hash
