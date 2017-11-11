@@ -1,3 +1,5 @@
+"""content is part of a panel, the content points further to a action or panel
+"""
 import uuid
 import sftoolbox
 
@@ -48,6 +50,8 @@ class ActionContent(Content):
     json_type = 'action'
 
     def __init__(self, project, target_action_idname=None):
+        """construct the action content
+        """
         super(ActionContent, self).__init__(project)
         self.target_action_idname = target_action_idname
 

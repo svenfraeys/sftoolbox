@@ -24,6 +24,8 @@ class Action(object):
         self.idname = str(uuid.uuid4())
         self.description = None
         self.icon_filepath = None
+        self.enabled = True
+        self.visible = True
 
     def _apply_json(self, data):
         """apply the json data
@@ -32,6 +34,8 @@ class Action(object):
         self.idname = data.get('idname')
         self.description = data.get('description')
         self.icon_filepath = data.get('icon')
+        self.enabled = data.get('enabled', True)
+        self.visible = data.get('visible', True)
 
     @property
     def absolute_icon_filepath(self):
@@ -41,7 +45,7 @@ class Action(object):
 
     @classmethod
     def from_json(cls, project, data):
-        action = Action(project)
+        action = cls(project)
         action._apply_json(data)
         return action
 
@@ -63,6 +67,17 @@ class Action(object):
 
 
 @sftoolbox.engine.register_action_class
+class DummyAction(Action):
+    """dummy action not doing anything
+    """
+    json_type = 'dummy'
+
+    def run(self):
+        """run the dummy action doing nothing
+        """
+
+
+@sftoolbox.engine.register_action_class
 class PythonCodeAction(Action):
     """python string execution
     """
@@ -75,14 +90,6 @@ class PythonCodeAction(Action):
     def _apply_json(self, data):
         super(PythonCodeAction, self)._apply_json(data)
         self.code = data.get('code', None)
-
-    @classmethod
-    def from_json(cls, project, data):
-        """return instance made from given json
-        """
-        action = cls(project)
-        action._apply_json(data)
-        return action
 
     @property
     def is_runnable(self):
@@ -129,14 +136,6 @@ class PythonScriptAction(Action):
     def _apply_json(self, data):
         super(PythonScriptAction, self)._apply_json(data)
         self.filepath = data.get('filepath', None)
-
-    @classmethod
-    def from_json(cls, project, data):
-        """return instance made from given json
-        """
-        action = cls(project)
-        action._apply_json(data)
-        return action
 
 
 @sftoolbox.engine.register_action_class
@@ -193,14 +192,6 @@ class PythonFunctionAction(Action):
         self.args = data.get('args', [])
         self.kwargs = data.get('kwargs', {})
 
-    @classmethod
-    def from_json(cls, project, data):
-        """return instance made from given json
-        """
-        action = cls(project)
-        action._apply_json(data)
-        return action
-
 
 def from_json(project, value):
     """return a action from the given json
@@ -210,4 +201,4 @@ def from_json(project, value):
         if json_type == class_.json_type:
             return class_.from_json(project, value)
 
-    return Action.from_json(project, value)
+    return DummyAction.from_json(project, value)

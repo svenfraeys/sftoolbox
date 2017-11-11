@@ -5,6 +5,7 @@ import os
 import sftoolbox.panels
 import sftoolbox.actions
 import sftoolbox.content
+import sftoolbox.variables
 import yaml
 
 
@@ -54,12 +55,22 @@ class Project(object):
         if data is None:
             data = {}
 
+        # if string just use it as a name
+        if isinstance(data, basestring):
+            data = {'name': data}
+
         self.name = data.get('name')
         self.description = data.get('description')
         self.active_panel_idname = data.get('active_panel')
         self.about = data.get('about')
         self.version = data.get('version')
         self.icon_filepath = data.get('icon')
+
+        variables = data.get('variables', [])
+
+        # register all variables
+        for variable in variables:
+            sftoolbox.variables.from_json(self, variable)
 
         # load actions
         actions = data.get('actions', [])

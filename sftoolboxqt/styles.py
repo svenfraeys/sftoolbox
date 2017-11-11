@@ -7,20 +7,29 @@ from sftoolboxqt import qtgui
 from sftoolboxqt import engine
 
 
+class StyleWidget(qtgui.QWidget):
+    """style widget
+    """
+
+    def __init__(self, panel, settings, parent=None):
+        super(StyleWidget, self).__init__(parent=parent)
+        self.panel = panel
+        self.settings = settings
+
+
 @engine.register_style_class
-class GridStyle(qtgui.QWidget):
+class GridStyle(StyleWidget):
     """horizontal layout system
     """
     json_type = 'grid'
 
-    def __init__(self, panel, parent=None):
-        super(GridStyle, self).__init__(parent=parent)
-        self.panel = panel
+    def __init__(self, panel, settings, parent=None):
+        super(GridStyle, self).__init__(panel, settings, parent=parent)
         self.item_count = 0
-        self.max_lines = 3
+        self.max_lines = settings.get('max', 3)
         self.row = 0
         self.column = 0
-        self.direction = 'vertical'
+        self.direction = settings.get('direction', 'vertical')
 
         layout = qtgui.QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -42,14 +51,13 @@ class GridStyle(qtgui.QWidget):
 
 
 @engine.register_style_class
-class HorizontalStyle(qtgui.QWidget):
+class HorizontalStyle(StyleWidget):
     """horizontal layout system
     """
     json_type = 'horizontal'
 
-    def __init__(self, panel, parent=None):
-        super(HorizontalStyle, self).__init__(parent=parent)
-        self.panel = panel
+    def __init__(self, panel, settings, parent=None):
+        super(HorizontalStyle, self).__init__(panel, settings, parent=parent)
         layout = qtgui.QHBoxLayout()
         self.setLayout(layout)
 
@@ -60,14 +68,13 @@ class HorizontalStyle(qtgui.QWidget):
 
 
 @engine.register_style_class
-class VerticalStyle(qtgui.QWidget):
+class VerticalStyle(StyleWidget):
     """horizontal layout system
     """
     json_type = 'vertical'
 
-    def __init__(self, panel, parent=None):
-        super(VerticalStyle, self).__init__(parent=parent)
-        self.panel = panel
+    def __init__(self, panel, settings, parent=None):
+        super(VerticalStyle, self).__init__(panel, settings, parent=parent)
         layout = qtgui.QVBoxLayout()
         self.setLayout(layout)
 
@@ -78,14 +85,13 @@ class VerticalStyle(qtgui.QWidget):
 
 
 @engine.register_style_class
-class DropdownStyle(qtgui.QWidget):
+class DropdownStyle(StyleWidget):
     """horizontal layout system
     """
     json_type = 'dropdown'
 
-    def __init__(self, panel, parent=None):
-        super(DropdownStyle, self).__init__(parent=parent)
-        self.panel = panel
+    def __init__(self, panel, settings, parent=None):
+        super(DropdownStyle, self).__init__(panel, settings, parent=parent)
         self._content = []
         self._menu = qtgui.QMenu()
         self._menu.aboutToShow.connect(self._handle_about_to_show)
@@ -148,8 +154,16 @@ def create_style(style_type, panel, args=None, kwargs=None):
     if not kwargs:
         kwargs = {}
 
+    settings = {}
+    if isinstance(style_type, dict):
+        style_type_name = style_type.keys()[0]
+        settings = style_type[style_type_name]
+        style_type = style_type_name
+
     for class_ in engine.style_classes_register:
         if class_.json_type == style_type:
-            return class_(panel, *args, **kwargs)
+            instance_ = class_(panel, settings, *args, **kwargs)
+            instance_.settings = settings
+            return instance_
 
-    return VerticalStyle(panel, *args, **kwargs)
+    return VerticalStyle(panel, settings, *args, **kwargs)

@@ -77,6 +77,8 @@ class ActionWidget(qtgui.QWidget):
             self._button.setToolTip(self.action.description)
             self._button.setStatusTip(self.action.description)
             self._button.clicked.connect(self._handle_click)
+            self._button.setEnabled(self.action.enabled)
+            self._button.setVisible(self.action.visible)
 
             icon_filepath = self.action.absolute_icon_filepath
             if self.show_icons:
@@ -179,21 +181,6 @@ class MainPanelWidget(PanelWidget):
 class ProjectWidget(qtgui.QWidget):
     """toolbox main window
     """
-    @property
-    def active_panel(self):
-        return self._active_panel
-
-    @active_panel.setter
-    def active_panel(self, value):
-        """set the active panel
-        """
-        self._active_panel = value
-
-        if value:
-            widget = MainPanelWidget(value)
-            self._scroll_area.setWidget(widget)
-        else:
-            self._scroll_area.setWidget(qtgui.QWidget())
 
     def _make_scroll_area(self):
         """return the scroll area
@@ -322,16 +309,24 @@ class ProjectWidget(qtgui.QWidget):
 
     def _refresh_content(self):
         if self.project:
-            self.setWindowTitle(self.project.human_name)
-            self.active_panel = self.project.active_panel
+            window_title = self.project.human_name
+            if self.project.version:
+                window_title += " " + str(self.project.version)
+            self.setWindowTitle(window_title)
             icon_filepath = self.project.absolute_icon_filepath
             if icon_filepath and os.path.exists(icon_filepath):
                 icon = qtgui.QIcon(icon_filepath)
                 self.setWindowIcon(icon)
+
+            if self.project.active_panel:
+                widget = MainPanelWidget(self.project.active_panel)
+                self._scroll_area.setWidget(widget)
+            else:
+                self._scroll_area.setWidget(qtgui.QWidget())
         else:
             self.setWindowTitle('SF ToolBox')
             self.setWindowIcon(qtgui.QIcon())
-            self.active_panel = None
+            self._scroll_area.setWidget(qtgui.QWidget())
 
     def _create_new_project_action(self):
         """return action that creates a new project
@@ -401,7 +396,6 @@ class ProjectWidget(qtgui.QWidget):
         super(ProjectWidget, self).__init__(parent=parent)
         self._project = None
         self._live_edit = False
-        self._active_panel = None
         self._live_thread = ReloadProjectThread()
 
         self._live_thread.project_changed.connect(self._do_update)

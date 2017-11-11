@@ -2,11 +2,18 @@ name: Hello Tools
 version: v1
 description: |
   This is a tool that will say hello to you in many languages
+variables:
+    - idname: name
+      type: text
+      default: "hello"
 panels:
   main:
     panels:
       benelux:
         actions:
+          name_input:
+            type: variable
+            variable: "hello"
           hello:
             type: python_code
             code: 'print "Hello !"'
@@ -25,7 +32,7 @@ panels:
             code: 'print "Guten Dag !"'
         panels:
           latin:
-            style: dropdown
+            style: horizontal
             actions:
               ola:
                 type: python_function
@@ -38,7 +45,7 @@ panels:
                 function: say_hello
                 icon: icons/it.png
                 args: ['IT']
-              bonjour2:
+              bonjour:
                 label: Bonjour
                 type: python_function
                 filepath: scripts/latin.py
