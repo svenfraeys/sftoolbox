@@ -17,7 +17,7 @@ class Project(object):
         """engine collecting all information
         """
         self.filepath = filepath
-        self.name = None
+        self.label = None
         self.version = None
         self.description = None
         self.active_panel_idname = None
@@ -42,8 +42,8 @@ class Project(object):
 
     @property
     def human_name(self):
-        if self.name:
-            return self.name
+        if self.label:
+            return self.label
 
         return os.path.splitext(os.path.basename(self.filepath))[0]
 
@@ -58,9 +58,9 @@ class Project(object):
 
         # if string just use it as a name
         if isinstance(data, basestring):
-            data = {'name': data}
+            data = {'label': data}
 
-        self.name = data.get('name')
+        self.label = data.get('label')
         self.description = data.get('description')
         self.active_panel_idname = data.get('active_panel')
         self.about = data.get('about')
@@ -89,7 +89,9 @@ class Project(object):
             sftoolbox.actions.from_json(self, action_dict)
 
         # load panels
+
         panels = data.get('panels', [])
+
         if isinstance(panels, dict):
             panel_list = []
             for idname, panel in panels.items():
@@ -100,6 +102,16 @@ class Project(object):
             panels = panel_list
         elif isinstance(panels, basestring):
             panels = [{'idname': panels}]
+
+        # add the main panel
+        main_panel = data.get('main')
+        if main_panel:
+            if isinstance(main_panel, basestring):
+                main_panel = {'idname': 'main', 'descriptoin': main_panel}
+            elif isinstance(main_panel, dict):
+                main_panel.setdefault('idname', 'main')
+
+            panels.insert(0, main_panel)
 
         if panels and not self.active_panel_idname:
             self.active_panel_idname = panels[0].get('idname')

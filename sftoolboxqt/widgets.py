@@ -314,7 +314,7 @@ class ProjectWidget(qtgui.QWidget):
         if not self.project:
             return
 
-        title = '{0} - {1}'.format(self.project.name, self.project.version)
+        title = '{0} - {1}'.format(self.project.label, self.project.version)
         qtgui.QMessageBox.about(self, title, self.project.about)
 
     def _refresh_content(self):
