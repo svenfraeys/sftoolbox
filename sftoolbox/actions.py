@@ -26,6 +26,7 @@ class Action(object):
         self.icon_filepath = None
         self.enabled = True
         self.visible = True
+        self.style_sheet = None
 
     def _apply_json(self, data):
         """apply the json data
@@ -36,6 +37,7 @@ class Action(object):
         self.icon_filepath = data.get('icon')
         self.enabled = data.get('enabled', True)
         self.visible = data.get('visible', True)
+        self.style_sheet = data.get('style_sheet', None)
 
     @property
     def absolute_icon_filepath(self):
@@ -61,7 +63,7 @@ class Action(object):
     @property
     def human_label(self):
         if self.label:
-            return self.label
+            return str(self.label)
         else:
             return sftoolbox.utils.human_readable(str(self.idname))
 
@@ -81,7 +83,7 @@ class DummyAction(Action):
 class PythonCodeAction(Action):
     """python string execution
     """
-    json_type = 'python_code'
+    json_type = 'python'
 
     def __init__(self, project, code=None):
         super(PythonCodeAction, self).__init__(project)

@@ -15,19 +15,19 @@ panels:
             type: variable
             variable: "hello"
           hello:
-            type: python_code
+            type: python
             code: 'print "Hello !"'
             icon: icons/uk.png
           bonjour:
-            type: python_code
+            type: python
             code: 'print "Bonjour !"'
             icon: icons/be.png
           hallo:
-            type: python_code
+            type: python
             code: 'print "Hallo !"'
             icon: icons/be.png
           guten.tag:
-            type: python_code
+            type: python
             icon: icons/du.png
             code: 'print "Guten Dag !"'
         panels:

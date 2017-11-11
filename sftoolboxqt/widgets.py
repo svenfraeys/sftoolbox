@@ -73,12 +73,13 @@ class ActionWidget(qtgui.QWidget):
 
         if self.action:
 
-            self.setWindowTitle(self.action.label)
+            self.setWindowTitle(self.action.human_label)
             self._button.setToolTip(self.action.description)
             self._button.setStatusTip(self.action.description)
             self._button.clicked.connect(self._handle_click)
             self._button.setEnabled(self.action.enabled)
             self._button.setVisible(self.action.visible)
+            self._button.setStyleSheet(self.action.style_sheet or '')
 
             icon_filepath = self.action.absolute_icon_filepath
             if self.show_icons:
@@ -159,6 +160,7 @@ class PanelWidget(qtgui.QWidget):
             self.setWindowTitle(self.panel.human_label)
             self.setToolTip(self.panel.description)
             self.setStatusTip(self.panel.description)
+            self.setStyleSheet(self.panel.style_sheet or '')
 
             for content in self.panel.content:
                 self.style.add_content(content,
@@ -171,6 +173,8 @@ class MainPanelWidget(PanelWidget):
     """
 
     def _refresh_content(self):
+        """refreshing of this widget is a bit different
+        """
         super(MainPanelWidget, self)._refresh_content()
         layout = self.layout()
         spacer = qtgui.QSpacerItem(0, 0, qtgui.QSizePolicy.Minimum,
@@ -243,18 +247,24 @@ class ProjectWidget(qtgui.QWidget):
         self.project = project
 
     def _create_about_action(self):
+        """return action that shows the about of the tool
+        """
         action = qtgui.QAction(self)
         action.setText('About')
         action.triggered.connect(self._show_about)
         return action
 
     def _create_about_toolbox_action(self):
+        """return action that shows the about information from tool box
+        """
         action = qtgui.QAction(self)
         action.setText('About SF Tool Box')
         action.triggered.connect(self._show_about_tool_box)
         return action
 
     def _create_reload_action(self):
+        """return a action that triggers a reload
+        """
         action = qtgui.QAction(self)
         action.setText('Reload Project')
         action.triggered.connect(self._handle_reload)
@@ -308,7 +318,11 @@ class ProjectWidget(qtgui.QWidget):
         qtgui.QMessageBox.about(self, title, self.project.about)
 
     def _refresh_content(self):
+        """refresh the content of the panel that we are viewing
+        """
+
         if self.project:
+            self.setStyleSheet(self.project.style_sheet)
             window_title = self.project.human_name
             if self.project.version:
                 window_title += " " + str(self.project.version)
@@ -324,6 +338,7 @@ class ProjectWidget(qtgui.QWidget):
             else:
                 self._scroll_area.setWidget(qtgui.QWidget())
         else:
+            self.setStyleSheet('')
             self.setWindowTitle('SF ToolBox')
             self.setWindowIcon(qtgui.QIcon())
             self._scroll_area.setWidget(qtgui.QWidget())

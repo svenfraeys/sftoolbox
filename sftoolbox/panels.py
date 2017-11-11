@@ -20,6 +20,7 @@ class Panel(object):
         self.show_icons = True
         self.icon = None
         self.style = 'vertical'
+        self.style_sheet = ''
 
     @property
     def human_label(self):
@@ -48,7 +49,8 @@ class Panel(object):
             'show_text': self.show_text,
             'show_icons': self.show_icons,
             'style': self.style,
-            'icon': self.icon
+            'icon': self.icon,
+            'style_sheet': self.style_sheet
         }
 
     @classmethod
@@ -66,6 +68,7 @@ class Panel(object):
         panel.show_icons = data.get('show_icons', True)
         panel.style = data.get('style', 'vertical')
         panel.icon = data.get('icon')
+        panel.style_sheet = data.get('style_sheet', '')
 
         # load in the actions define in the panel
         actions = data.get('actions')
@@ -75,6 +78,9 @@ class Panel(object):
                 for idname, action in actions.items():
                     if isinstance(action, basestring):
                         action = {'description': action}
+                    if action is None:
+                        action = {}
+
                     action.setdefault('idname', idname)
                     action_list.append(action)
                 actions = action_list

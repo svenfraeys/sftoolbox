@@ -22,6 +22,7 @@ class Project(object):
         self.description = None
         self.active_panel_idname = None
         self.about = ''
+        self.style_sheet = ''
 
         self.actions = []
         self.content = []
@@ -65,6 +66,7 @@ class Project(object):
         self.about = data.get('about')
         self.version = data.get('version')
         self.icon_filepath = data.get('icon')
+        self.style_sheet = data.get('style_sheet', '')
 
         variables = data.get('variables', [])
 

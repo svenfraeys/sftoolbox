@@ -9,7 +9,7 @@ import MaxPlus
 class MaxScriptEvalAction(Action):
     """mel eval
     """
-    json_type = 'max_code'
+    json_type = 'maxscript'
 
     def __init__(self, project, code=None):
         """construct the project
@@ -37,7 +37,7 @@ class MaxScriptEvalAction(Action):
 class MaxScriptAction(Action):
     """run a python script filepath that is given
     """
-    json_type = 'max_script'
+    json_type = 'maxscript_script'
 
     def __init__(self, project, filepath=None):
         """python script filepath

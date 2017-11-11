@@ -7,7 +7,7 @@ from maya import mel
 class MelEvalAction(Action):
     """mel eval
     """
-    json_type = 'mel_eval'
+    json_type = 'mel'
 
     def __init__(self, project, code=None):
         """construct the project
