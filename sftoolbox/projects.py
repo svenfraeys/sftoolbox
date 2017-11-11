@@ -50,6 +50,9 @@ class Project(object):
     def _load_project(self):
         """load in the project from the directory data
         """
+        if not self.filepath or not os.path.exists(self.filepath):
+            return
+
         with open(self.filepath, 'r') as fp:
             data = yaml.load(fp)
 
@@ -86,7 +89,7 @@ class Project(object):
             actions = [{'idname': actions}]
 
         for action_dict in actions:
-            sftoolbox.actions.from_json(self, action_dict)
+            sftoolbox.actions.action_from_json(self, action_dict)
 
         # load panels
 

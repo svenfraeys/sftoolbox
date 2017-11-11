@@ -35,7 +35,7 @@ def main(args=None):
     namespace = parser.parse_args(args)
     project = None
 
-    from sftoolbox.project import Project
+    from sftoolbox.projects import Project
     from sftoolboxmaya.widgets import MayaProjectWidget
     from sftoolboxmaya import actions
     assert actions

@@ -77,6 +77,7 @@ class DummyAction(Action):
     def run(self):
         """run the dummy action doing nothing
         """
+        return True
 
 
 @sftoolbox.engine.register_action_class
@@ -102,8 +103,9 @@ class PythonCodeAction(Action):
     def run(self):
         if self.code:
             exec (self.code)
+            return True
         else:
-            raise RuntimeError
+            raise False
 
 
 @sftoolbox.engine.register_action_class
@@ -134,6 +136,7 @@ class PythonScriptAction(Action):
             exec (open(self.absolute_filepath).read())
         else:
             execfile(self.absolute_filepath)
+        return True
 
     def _apply_json(self, data):
         super(PythonScriptAction, self)._apply_json(data)
@@ -185,7 +188,8 @@ class PythonFunctionAction(Action):
             function_name = 'main'
 
         func = getattr(module_object, function_name)
-        return func(*self.args, **self.kwargs)
+        func(*self.args, **self.kwargs)
+        return True
 
     def _apply_json(self, data):
         super(PythonFunctionAction, self)._apply_json(data)
@@ -195,7 +199,7 @@ class PythonFunctionAction(Action):
         self.kwargs = data.get('kwargs', {})
 
 
-def from_json(project, value):
+def action_from_json(project, value):
     """return a action from the given json
     """
     json_type = value.get('type')

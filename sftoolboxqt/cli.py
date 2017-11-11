@@ -4,7 +4,7 @@ import sys
 import argparse
 
 from sftoolboxqt import qtgui
-from sftoolbox.project import Project
+from sftoolbox.projects import Project
 from sftoolboxqt.widgets import ProjectWidget
 
 

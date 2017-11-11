@@ -103,7 +103,7 @@ class Panel(object):
                     action['label'] = sftoolbox.utils.human_readable(
                         str(original_idname))
 
-                action = sftoolbox.actions.from_json(project, action)
+                action = sftoolbox.actions.action_from_json(project, action)
                 content_i = sftoolbox.content.ActionContent(project)
                 content_i.panel = panel
                 content_i.target_action = action

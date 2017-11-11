@@ -4,7 +4,7 @@ import os
 
 import sftoolbox
 import sftoolbox.content
-from sftoolbox.project import Project
+from sftoolbox.projects import Project
 from sftoolboxqt import qtgui
 from sftoolboxqt import utils
 from sftoolboxqt import qtcore
@@ -243,7 +243,7 @@ class ProjectWidget(qtgui.QWidget):
         if not filepath:
             return
 
-        project = sftoolbox.project.Project(filepath)
+        project = sftoolbox.projects.Project(filepath)
         self.project = project
 
     def _create_about_action(self):
@@ -364,7 +364,7 @@ class ProjectWidget(qtgui.QWidget):
         open(filepath, 'w').close()
 
         # load it
-        project = sftoolbox.project.Project(filepath)
+        project = sftoolbox.projects.Project(filepath)
         self.project = project
 
         utils.open_with_default_program(self.project.filepath)
