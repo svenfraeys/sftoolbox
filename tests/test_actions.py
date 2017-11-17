@@ -44,7 +44,7 @@ def test_python_code_action():
 
 
 @sftoolbox.engine.register_action_class
-class TestFailRunAction(Action):
+class FailRunAction(Action):
     """action that always returns false
     """
     json_type = 'test_fail_run'
@@ -58,5 +58,5 @@ def test_fail_run_action():
     """
     project = Project()
     action = action_from_json(project, {'type': 'test_fail_run'})
-    assert isinstance(action, TestFailRunAction)
+    assert isinstance(action, FailRunAction)
     assert action.run() is False
