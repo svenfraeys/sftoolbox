@@ -31,11 +31,16 @@ class Panel(object):
 
     @property
     def content(self):
-        """return all content belonging to the panel"""
+        """return all content belonging to the panel
+        """
         content_list = []
         for content in self.project.content:
             if content.panel_idname == self.idname:
                 content_list.append(content)
+
+        # sort by weight
+        content_list.sort(key=lambda x: x.weight)
+
         return content_list
 
     def to_json(self):

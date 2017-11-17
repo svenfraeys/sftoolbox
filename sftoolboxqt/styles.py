@@ -62,6 +62,7 @@ class HorizontalStyle(StyleWidget):
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):
+        # import here otherwise it breaks
         from sftoolboxqt.widgets import ContentWidget
         content_widget = ContentWidget(content, show_icons, show_text)
         self.layout().addWidget(content_widget)

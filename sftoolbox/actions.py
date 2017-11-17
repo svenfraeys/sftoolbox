@@ -102,7 +102,7 @@ class PythonCodeAction(Action):
 
     def run(self):
         if self.code:
-            exec (self.code)
+            exec self.code
             return True
         else:
             raise False
