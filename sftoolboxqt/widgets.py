@@ -208,6 +208,17 @@ class ProjectWidget(qtgui.QWidget):
         if not self.project:
             print('no current project')
             return
+
+        if not self.live_edit:
+            answer = qtgui.QMessageBox.question(
+                self, "Activate Live Edit ?",
+                "Do you want to enable live edit "
+                "so changes are live updated ?",
+                qtgui.QMessageBox.Yes | qtgui.QMessageBox.No)
+
+            if answer == qtgui.QMessageBox.Yes:
+                self.live_edit = True
+
         utils.open_with_default_program(self.project.filepath)
 
     def _create_open_project_action(self):
