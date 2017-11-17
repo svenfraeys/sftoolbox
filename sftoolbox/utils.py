@@ -1,3 +1,5 @@
+"""general utilities for sftoolbox
+"""
 import hashlib
 
 

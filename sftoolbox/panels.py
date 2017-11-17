@@ -125,7 +125,7 @@ class Panel(object):
                     content_i['label'] = sftoolbox.utils.human_readable(
                         str(content_i['idname']))
                 content_i['idname'] = panel.idname + '.' + content_i['idname']
-                content_i = sftoolbox.content.from_json(project, content_i)
+                content_i = sftoolbox.content.content_from_json(project, content_i)
                 content_i.panel = panel
 
         panels = data.get('panels')

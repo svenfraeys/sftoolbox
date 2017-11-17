@@ -40,7 +40,9 @@ class Content(object):
 
     @classmethod
     def from_json(cls, project, data):
-        raise NotImplementedError
+        content = cls(project)
+        content.load_json(data)
+        return content
 
 
 @sftoolbox.engine.register_content_class
@@ -72,12 +74,6 @@ class ActionContent(Content):
         super(ActionContent, self).load_json(data)
         self.target_action_idname = data.get('target_action')
 
-    @classmethod
-    def from_json(cls, project, data):
-        content = cls(project)
-        content.load_json(data)
-        return content
-
 
 @sftoolbox.engine.register_content_class
 class PanelContent(Content):
@@ -102,12 +98,6 @@ class PanelContent(Content):
         else:
             self.target_panel_idname = None
 
-    @classmethod
-    def from_json(cls, project, data):
-        content = cls(project)
-        content.load_json(data)
-        return content
-
     def load_json(self, data):
         """load the json in
         """
@@ -115,7 +105,7 @@ class PanelContent(Content):
         self.target_panel_idname = data.get('target_panel')
 
 
-def from_json(project, data):
+def content_from_json(project, data):
     """make a content from the given json data
     """
     json_type = data.get('type')

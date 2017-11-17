@@ -23,7 +23,7 @@ def test_action_from_json():
 def test_action_run():
     project = Project()
     action = Action(project)
-    pytest.raises(NotImplementedError, action.run)
+    assert action.run() is True
 
 
 def test_python_code_action():

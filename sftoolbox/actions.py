@@ -54,7 +54,7 @@ class Action(object):
     def run(self):
         """run the given action
         """
-        raise NotImplementedError
+        return True
 
     @property
     def is_runnable(self):

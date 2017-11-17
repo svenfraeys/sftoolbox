@@ -1,12 +1,12 @@
 """engine containing and managing each component
 """
 import os
+import yaml
 
 import sftoolbox.panels
 import sftoolbox.actions
 import sftoolbox.content
 import sftoolbox.variables
-import yaml
 
 
 class Project(object):
@@ -132,7 +132,7 @@ class Project(object):
             content = content_list
 
         for content_dict in content:
-            sftoolbox.content.from_json(self, content_dict)
+            sftoolbox.content.content_from_json(self, content_dict)
 
     def add(self, value):
         """add a given element
