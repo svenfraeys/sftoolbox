@@ -333,6 +333,7 @@ class ProjectWidget(qtgui.QWidget):
         """
 
         if self.project:
+            self._menu_bar.setVisible(self.project.menu_bar_visible)
             self.setStyleSheet(self.project.style_sheet)
             window_title = self.project.human_name
             if self.project.version:
@@ -342,13 +343,23 @@ class ProjectWidget(qtgui.QWidget):
             if icon_filepath and os.path.exists(icon_filepath):
                 icon = qtgui.QIcon(icon_filepath)
                 self.setWindowIcon(icon)
+            else:
+                # clear the icon
+                self.setWindowIcon(qtgui.QIcon())
 
             if self.project.active_panel:
                 widget = MainPanelWidget(self.project.active_panel)
-                self._scroll_area.setWidget(widget)
+                main_widget = qtgui.QWidget()
+                main_layout = qtgui.QVBoxLayout()
+                main_widget.setLayout(main_layout)
+                main_layout.addWidget(widget)
+                self._scroll_area.setWidget(main_widget)
+
+                # self._scroll_area.setWidget(widget)
             else:
                 self._scroll_area.setWidget(qtgui.QWidget())
         else:
+            self._menu_bar.setVisible(True)
             self.setStyleSheet('')
             self.setWindowTitle('SF ToolBox')
             self.setWindowIcon(qtgui.QIcon())
@@ -399,6 +410,7 @@ class ProjectWidget(qtgui.QWidget):
         self._project = value
         if value:
             self._live_thread.filepath = value.filepath
+            self._project.activate()
         self._refresh_content()
 
     @property
@@ -436,6 +448,7 @@ class ProjectWidget(qtgui.QWidget):
         self._close_action = self._create_close_action()
 
         menu = qtgui.QMenuBar()
+        self._menu_bar = menu
         file_menu = menu.addMenu('File')
         file_menu.addAction(self._new_project_action)
         file_menu.addAction(self._open_project_action)

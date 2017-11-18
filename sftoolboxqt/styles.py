@@ -33,6 +33,7 @@ class GridStyle(StyleWidget):
 
         layout = qtgui.QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):
@@ -59,6 +60,8 @@ class HorizontalStyle(StyleWidget):
     def __init__(self, panel, settings, parent=None):
         super(HorizontalStyle, self).__init__(panel, settings, parent=parent)
         layout = qtgui.QHBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):
@@ -77,6 +80,8 @@ class VerticalStyle(StyleWidget):
     def __init__(self, panel, settings, parent=None):
         super(VerticalStyle, self).__init__(panel, settings, parent=parent)
         layout = qtgui.QVBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
     def add_content(self, content, show_icons=True, show_text=True):

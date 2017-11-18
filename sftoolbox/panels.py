@@ -39,7 +39,7 @@ class Panel(object):
                 content_list.append(content)
 
         # sort by weight
-        content_list.sort(key=lambda x: x.weight)
+        content_list.sort(key=lambda x: x.weight, reverse=True)
 
         return content_list
 
@@ -108,10 +108,12 @@ class Panel(object):
                     action['label'] = sftoolbox.utils.human_readable(
                         str(original_idname))
 
-                action = sftoolbox.actions.action_from_json(project, action)
+                action_instance = sftoolbox.actions.action_from_json(project,
+                                                                     action)
                 content_i = sftoolbox.content.ActionContent(project)
+                content_i.weight = action.get('weight', 0)
                 content_i.panel = panel
-                content_i.target_action = action
+                content_i.target_action = action_instance
 
         content = data.get('content')
         if content:

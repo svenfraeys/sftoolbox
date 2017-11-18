@@ -1,6 +1,7 @@
 """engine containing and managing each component
 """
 import os
+import sys
 import yaml
 
 import sftoolbox.panels
@@ -23,10 +24,12 @@ class Project(object):
         self.active_panel_idname = None
         self.about = ''
         self.style_sheet = ''
+        self.sys_path = []
 
         self.actions = []
         self.content = []
         self.panels = []
+        self.menu_bar_visible = True
         self._load_project()
 
     @property
@@ -70,6 +73,12 @@ class Project(object):
         self.version = data.get('version')
         self.icon_filepath = data.get('icon')
         self.style_sheet = data.get('style_sheet', '')
+        self.menu_bar_visible = data.get('menu_bar_visible', True)
+        sys_path = data.get('sys_path', ['.'])
+        if isinstance(sys_path, basestring):
+            sys_path = [sys_path]
+
+        self.sys_path = sys_path
 
         variables = data.get('variables', [])
 
@@ -143,6 +152,19 @@ class Project(object):
             self.actions.append(value)
         elif isinstance(value, sftoolbox.content.Content):
             self.content.append(value)
+
+    def apply_sys_path(self):
+        """apply adding the sys path
+        """
+        for sys_path in self.sys_path:
+            sys_path = os.path.join(os.path.dirname(self.filepath), sys_path)
+            sys_path = os.path.abspath(sys_path)
+            sys.path.append(sys_path)
+
+    def activate(self):
+        """activate the project in the current session
+        """
+        self.apply_sys_path()
 
     @property
     def active_panel(self):
