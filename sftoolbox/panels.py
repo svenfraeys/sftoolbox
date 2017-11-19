@@ -40,7 +40,7 @@ class Panel(object):
                 content_list.append(content)
 
         # sort by weight
-        content_list.sort(key=lambda x: x.weight, reverse=True)
+        content_list.sort(key=lambda x: -x.weight, reverse=True)
 
         return content_list
 
