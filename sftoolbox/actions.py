@@ -24,6 +24,7 @@ class Action(object):
         self.idname = str(uuid.uuid4())
         self.description = None
         self.icon_filepath = None
+        self.icon_size = None
         self.enabled = True
         self.visible = True
         self.style_sheet = None
@@ -35,6 +36,7 @@ class Action(object):
         self.idname = data.get('idname')
         self.description = data.get('description')
         self.icon_filepath = data.get('icon')
+        self.icon_size = data.get('icon_size', 'small')
         self.enabled = data.get('enabled', True)
         self.visible = data.get('visible', True)
         self.style_sheet = data.get('style_sheet', None)

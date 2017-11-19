@@ -18,6 +18,7 @@ class Panel(object):
         self.is_main_panel = False
         self.show_text = True
         self.show_icons = True
+        self.icon_size = 'small'
         self.icon = None
         self.style = 'vertical'
         self.style_sheet = ''
@@ -74,6 +75,7 @@ class Panel(object):
         panel.style = data.get('style', 'vertical')
         panel.icon = data.get('icon')
         panel.style_sheet = data.get('style_sheet', '')
+        panel.icon_size = data.get('icon_size', None)
 
         # load in the actions define in the panel
         actions = data.get('actions')
@@ -132,7 +134,8 @@ class Panel(object):
                     content_i['label'] = sftoolbox.utils.human_readable(
                         str(content_i['idname']))
                 content_i['idname'] = panel.idname + '.' + content_i['idname']
-                content_i = sftoolbox.content.content_from_json(project, content_i)
+                content_i = sftoolbox.content.content_from_json(project,
+                                                                content_i)
                 content_i.panel = panel
 
         panels = data.get('panels')

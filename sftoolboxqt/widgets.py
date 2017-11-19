@@ -40,12 +40,13 @@ class ActionWidget(qtgui.QWidget):
     """
 
     def __init__(self, action=None, show_text=True, show_icons=True,
-                 parent=None):
+                 icon_size=None, parent=None):
         super(ActionWidget, self).__init__(parent=parent)
         self.action = action
         self._button = qtgui.QPushButton()
         self.show_text = show_text
         self.show_icons = show_icons
+        self.icon_size = icon_size
 
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)
@@ -85,6 +86,8 @@ class ActionWidget(qtgui.QWidget):
             if self.show_icons:
                 if icon_filepath and os.path.exists(icon_filepath):
                     self._button.setIcon(qtgui.QIcon(icon_filepath))
+                    self._button.setIconSize(
+                        utils.get_icon_size(self.icon_size))
 
     def _handle_click(self):
         """handle clicking on the action button
@@ -101,6 +104,7 @@ class ContentWidget(qtgui.QWidget):
     """
 
     def __init__(self, content=None, show_icons=True, show_text=True,
+                 icon_size=None,
                  parent=None):
         """construct the button
         """
@@ -108,6 +112,7 @@ class ContentWidget(qtgui.QWidget):
         self.content = content
         self.show_text = show_text
         self.show_icons = show_icons
+        self.icon_size = icon_size
 
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)
@@ -124,7 +129,8 @@ class ContentWidget(qtgui.QWidget):
         if isinstance(self.content, sftoolbox.content.ActionContent):
             widget = ActionWidget(self.content.target_action,
                                   show_icons=self.show_icons,
-                                  show_text=self.show_text)
+                                  show_text=self.show_text,
+                                  icon_size=self.icon_size)
 
         elif isinstance(self.content, sftoolbox.content.PanelContent):
             widget = PanelWidget(self.content.target_panel)

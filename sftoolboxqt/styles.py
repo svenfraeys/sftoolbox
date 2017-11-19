@@ -4,6 +4,7 @@ import functools
 
 from sftoolbox.content import ActionContent, PanelContent
 from sftoolboxqt import qtgui
+from sftoolboxqt import utils
 from sftoolboxqt import engine
 
 
@@ -38,7 +39,8 @@ class GridStyle(StyleWidget):
 
     def add_content(self, content, show_icons=True, show_text=True):
         from sftoolboxqt.widgets import ContentWidget
-        content_widget = ContentWidget(content, show_icons, show_text)
+        content_widget = ContentWidget(content, show_icons, show_text,
+                                       icon_size=self.panel.icon_size)
 
         if self.direction == 'vertical':
             self.layout().addWidget(content_widget, self.row, self.column)
@@ -67,7 +69,8 @@ class HorizontalStyle(StyleWidget):
     def add_content(self, content, show_icons=True, show_text=True):
         # import here otherwise it breaks
         from sftoolboxqt.widgets import ContentWidget
-        content_widget = ContentWidget(content, show_icons, show_text)
+        content_widget = ContentWidget(content, show_icons, show_text,
+                                       icon_size=self.panel.icon_size)
         self.layout().addWidget(content_widget)
 
 
@@ -86,7 +89,8 @@ class VerticalStyle(StyleWidget):
 
     def add_content(self, content, show_icons=True, show_text=True):
         from sftoolboxqt.widgets import ContentWidget
-        content_widget = ContentWidget(content, show_icons, show_text)
+        content_widget = ContentWidget(content, show_icons, show_text,
+                                       icon_size=self.panel.icon_size)
         self.layout().addWidget(content_widget)
 
 
@@ -103,8 +107,10 @@ class DropdownStyle(StyleWidget):
         self._menu.aboutToShow.connect(self._handle_about_to_show)
 
         self._button = qtgui.QPushButton(self.panel.human_label)
+
         self._button.setMenu(self._menu)
         self._button.setIcon(qtgui.QIcon(self.panel.absolute_icon_filepath))
+        self._button.setIconSize(utils.get_icon_size(self.panel.icon_size))
 
         layout = qtgui.QVBoxLayout()
         layout.setSpacing(0)
