@@ -103,6 +103,9 @@ class Panel(object):
                     action = {'idname': str(action)}
 
                 # add idname prefix of this current panel
+                if 'idname' not in action:
+                    action['idname'] = str(uuid.uuid4())
+
                 original_idname = action['idname']
                 action['idname'] = panel.idname + '.' + original_idname
 
