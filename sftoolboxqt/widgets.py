@@ -4,7 +4,7 @@ import os
 
 import sftoolbox
 import sftoolbox.content
-from sftoolbox.projects import Project
+from sftoolbox.projects import load_project_from_filepath
 from sftoolboxqt import qtgui
 from sftoolboxqt import utils
 from sftoolboxqt import qtcore
@@ -260,7 +260,7 @@ class ProjectWidget(qtgui.QWidget):
         if not filepath:
             return
 
-        project = sftoolbox.projects.Project(filepath)
+        project = load_project_from_filepath(filepath)
         self.project = project
 
     def _create_about_action(self):
@@ -293,7 +293,7 @@ class ProjectWidget(qtgui.QWidget):
         if not self.project:
             return
 
-        project = Project(self.project.filepath)
+        project = load_project_from_filepath(self.project.filepath)
         self.project = project
 
     def _create_close_action(self):
@@ -392,7 +392,7 @@ class ProjectWidget(qtgui.QWidget):
         open(filepath, 'w').close()
 
         # load it
-        project = sftoolbox.projects.Project(filepath)
+        project = load_project_from_filepath(filepath)
         self.project = project
 
         utils.open_with_default_program(self.project.filepath)
@@ -433,7 +433,7 @@ class ProjectWidget(qtgui.QWidget):
             self._live_thread.terminate()
 
     def _do_update(self, value):
-        new_project = Project(value)
+        new_project = load_project_from_filepath(value)
         self.project = new_project
 
     def __init__(self, project=None, parent=None):

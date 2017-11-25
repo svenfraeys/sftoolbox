@@ -4,7 +4,7 @@ import sys
 import argparse
 
 from sftoolboxqt import qtgui
-from sftoolbox.projects import Project
+from sftoolbox.projects import load_project_from_filepath
 from sftoolboxqt.widgets import ProjectWidget
 
 
@@ -19,7 +19,8 @@ def main(args):
     namespace = parser.parse_args(args)
     project = None
     if namespace.project:
-        project = Project(namespace.project)
+        project = load_project_from_filepath(namespace.project)
+        project.activate()
 
     w = ProjectWidget(project)
     w.live_edit = namespace.live
