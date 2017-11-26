@@ -158,7 +158,7 @@ def load_project_from_filepath(filepath):
     main_panel = data.get('main')
     if main_panel:
         if isinstance(main_panel, basestring):
-            main_panel = {'idname': 'main', 'descriptoin': main_panel}
+            main_panel = {'idname': 'main', 'description': main_panel}
         elif isinstance(main_panel, dict):
             main_panel.setdefault('idname', 'main')
 

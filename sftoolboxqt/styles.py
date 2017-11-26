@@ -3,9 +3,17 @@
 import functools
 
 from sftoolbox.content import ActionContent, PanelContent
-from sftoolboxqt import qtgui, qtcore
+from sftoolboxqt import qtgui
 from sftoolboxqt import utils
 from sftoolboxqt import engine
+
+
+def _clear_layout(layout):
+    """clear layout
+    """
+    while layout.count() != 0:
+        widget_item = layout.takeAt(0)
+        widget_item.widget().setParent(None)
 
 
 class StyleWidget(qtgui.QWidget):
@@ -16,6 +24,11 @@ class StyleWidget(qtgui.QWidget):
         super(StyleWidget, self).__init__(parent=parent)
         self.panel = panel
         self.settings = settings
+
+    def clear_content(self):
+        """clear the content
+        """
+        pass
 
 
 @engine.register_style_class
@@ -37,7 +50,14 @@ class GridStyle(StyleWidget):
         layout.setSpacing(0)
         self.setLayout(layout)
 
+    def clear_content(self):
+        """remove all the content
+        """
+        _clear_layout(self.layout())
+
     def add_content(self, content, show_icons=True, show_text=True):
+        """add given content
+        """
         from sftoolboxqt.widgets import ContentWidget
         content_widget = ContentWidget(content, show_icons, show_text,
                                        icon_size=self.panel.icon_size)
@@ -66,6 +86,11 @@ class HorizontalStyle(StyleWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
+    def clear_content(self):
+        """remove all the content
+        """
+        _clear_layout(self.layout())
+
     def add_content(self, content, show_icons=True, show_text=True):
         # import here otherwise it breaks
         from sftoolboxqt.widgets import ContentWidget
@@ -86,6 +111,11 @@ class VerticalStyle(StyleWidget):
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+
+    def clear_content(self):
+        """remove all the content
+        """
+        _clear_layout(self.layout())
 
     def add_content(self, content, show_icons=True, show_text=True):
         from sftoolboxqt.widgets import ContentWidget
@@ -117,6 +147,11 @@ class DropdownStyle(StyleWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         layout.addWidget(self._button)
+
+    def clear_content(self):
+        """remove all the content
+        """
+        self._content = []
 
     def add_content(self, content, show_icons=True, show_text=True):
         self._content.append(content)
@@ -199,6 +234,11 @@ class DropdownButtonStyle(StyleWidget):
         layout.addWidget(self._action_widget)
         layout.addWidget(self._other_button)
 
+    def clear_content(self):
+        """remove all the content
+        """
+        self._content = []
+
     def add_content(self, content, show_icons=True, show_text=True):
         self._content.append(content)
 
@@ -214,6 +254,11 @@ class DropdownButtonStyle(StyleWidget):
         for content in content_list:
             if isinstance(content, ActionContent):
                 action = content.target_action
+                if not action:
+                    print 'can not find action with id {0}'.format(
+                        content.target_action_idname)
+                    continue
+
                 q_action = qtgui.QAction(self)
                 if self.panel.show_text:
                     q_action.setText(action.human_label)

@@ -28,6 +28,7 @@ class Action(object):
         self.enabled = True
         self.visible = True
         self.style_sheet = None
+        self.tags = []
 
     def _apply_json(self, data):
         """apply the json data
@@ -40,6 +41,15 @@ class Action(object):
         self.enabled = data.get('enabled', True)
         self.visible = data.get('visible', True)
         self.style_sheet = data.get('style_sheet', None)
+
+        tags = []
+        if 'tags' in data:
+            if isinstance(data['tags'], basestring):
+                tags += [tag.strip() for tag in data['tags'].split(',')]
+            else:
+                tags += data['tags']
+
+        self.tags = tags
 
     @property
     def absolute_icon_filepath(self):

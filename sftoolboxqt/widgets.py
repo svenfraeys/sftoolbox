@@ -1,11 +1,12 @@
 """widgets available for toolbox
 """
 import os
-
+from sftoolbox.content import ActionContent
 import sftoolbox
 import sftoolbox.content
 from sftoolbox.projects import load_project_from_filepath
 from sftoolboxqt import qtgui
+from sftoolboxqt.editor import EditorWidget
 from sftoolboxqt import utils
 from sftoolboxqt import qtcore
 from sftoolboxqt.styles import create_style
@@ -147,6 +148,7 @@ class PanelWidget(qtgui.QWidget):
     def __init__(self, panel=None, parent=None):
         super(PanelWidget, self).__init__(parent=parent)
         self.panel = panel
+        self.setAcceptDrops(True)
 
         self.style = create_style(panel.style, panel)
 
@@ -159,6 +161,24 @@ class PanelWidget(qtgui.QWidget):
         self.setLayout(layout)
         self._refresh_content()
 
+    def dragEnterEvent(self, event):
+        event.acceptProposedAction()
+
+    def add_content(self, content, show_icons=True, show_text=True):
+        """add content
+        """
+        return
+
+    def dropEvent(self, event):
+        source = event.source()
+        if isinstance(source, qtgui.QTreeWidget):
+            for item in source.selectedItems():
+                content = ActionContent(self.panel.project, item.action.idname)
+                content.panel = self.panel
+            self._refresh_content()
+
+        event.acceptProposedAction()
+
     def _refresh_content(self):
         """refresh the content of the panel
         """
@@ -167,6 +187,8 @@ class PanelWidget(qtgui.QWidget):
             self.setToolTip(self.panel.description)
             self.setStatusTip(self.panel.description)
             self.setStyleSheet(self.panel.style_sheet or '')
+
+            self.style.clear_content()
 
             for content in self.panel.content:
                 self.style.add_content(content,
@@ -191,6 +213,7 @@ class MainPanelWidget(PanelWidget):
 class ProjectWidget(qtgui.QWidget):
     """toolbox main window
     """
+    _instances = []
 
     def _make_scroll_area(self):
         """return the scroll area
@@ -371,6 +394,21 @@ class ProjectWidget(qtgui.QWidget):
             self.setWindowIcon(qtgui.QIcon())
             self._scroll_area.setWidget(qtgui.QWidget())
 
+    def _handle_new_panel(self):
+        """handle the opening of a new panel
+        """
+        widget = ProjectWidget(self.project)
+        self._instances.append(widget)
+        widget.show()
+
+    def _create_new_panel_action(self):
+        """return action that creates a new project
+        """
+        action = qtgui.QAction(self)
+        action.setText("New Panel...")
+        action.triggered.connect(self._handle_new_panel)
+        return action
+
     def _create_new_project_action(self):
         """return action that creates a new project
         """
@@ -378,6 +416,20 @@ class ProjectWidget(qtgui.QWidget):
         action.setText("New Project...")
         action.triggered.connect(self._handle_new_project)
         return action
+
+    def _create_editor_action(self):
+        """return action that lets you browse trough all actions
+        """
+        action = qtgui.QAction(self)
+        action.setText('Editor...')
+        action.triggered.connect(self._handle_show_editor)
+        return action
+
+    def _handle_show_editor(self):
+        """handle browsing trough actions
+        """
+        self._editor_widget.project = self.project
+        self._editor_widget.show()
 
     def _handle_new_project(self):
         """handle creating new projects
@@ -438,6 +490,7 @@ class ProjectWidget(qtgui.QWidget):
 
     def __init__(self, project=None, parent=None):
         super(ProjectWidget, self).__init__(parent=parent)
+        self._editor_widget = EditorWidget(project)
         self._project = None
         self._live_edit = False
         self._live_thread = ReloadProjectThread()
@@ -449,9 +502,11 @@ class ProjectWidget(qtgui.QWidget):
         self._edit_project_action = self._create_edit_project()
         self._close_project_action = self._create_close_project_action()
         self._about_toolbox_action = self._create_about_toolbox_action()
+        self._new_panel_action = self._create_new_panel_action()
         self._new_project_action = self._create_new_project_action()
         self._reload_action = self._create_reload_action()
         self._close_action = self._create_close_action()
+        self._actions_action = self._create_editor_action()
 
         menu = qtgui.QMenuBar()
         self._menu_bar = menu
@@ -463,10 +518,14 @@ class ProjectWidget(qtgui.QWidget):
         file_menu.addAction(self._reload_action)
         file_menu.addAction(self._edit_project_action)
         file_menu.addSeparator()
+        file_menu.addAction(self._new_panel_action)
+        file_menu.addSeparator()
         file_menu.addAction(self._close_action)
 
         tools_menu = menu.addMenu('Tools')
         tools_menu.addAction(self._live_edit_action)
+        tools_menu.addSeparator()
+        tools_menu.addAction(self._actions_action)
         help_menu = menu.addMenu('Help')
         help_menu.addAction(self._about_action)
         help_menu.addSeparator()
@@ -491,3 +550,8 @@ class ProjectWidget(qtgui.QWidget):
 
     def sizeHint(self):
         return qtcore.QSize(250, 300)
+
+    def showEvent(self, _):
+        """reload the content
+        """
+        self._refresh_content()
