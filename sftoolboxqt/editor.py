@@ -138,9 +138,11 @@ class EditorWidget(qtgui.QWidget):
         self._panels_widget = PanelsWidget(project)
 
         layout = qtgui.QHBoxLayout()
-        layout.addWidget(self._panels_widget)
-        layout.addStretch()
-        layout.addWidget(self._actions_widget)
+
+        splitter = qtgui.QSplitter(qtcore.Qt.Horizontal)
+        splitter.addWidget(self._panels_widget)
+        splitter.addWidget(self._actions_widget)
+        layout.addWidget(splitter)
         self.setLayout(layout)
 
     @property
@@ -154,4 +156,4 @@ class EditorWidget(qtgui.QWidget):
         self._panels_widget.project = value
 
     def sizeHint(self):
-        return qtcore.QSize(600, 800)
+        return qtcore.QSize(900, 800)

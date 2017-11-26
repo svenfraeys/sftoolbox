@@ -313,11 +313,7 @@ class ProjectWidget(qtgui.QWidget):
     def _handle_reload(self):
         """handle reload
         """
-        if not self.project:
-            return
-
-        project = load_project_from_filepath(self.project.filepath)
-        self.project = project
+        self._refresh_content()
 
     def _create_close_action(self):
         """create a close action
@@ -491,6 +487,9 @@ class ProjectWidget(qtgui.QWidget):
     def __init__(self, project=None, parent=None):
         super(ProjectWidget, self).__init__(parent=parent)
         self._editor_widget = EditorWidget(project)
+        self._editor_widget._panels_widget._tree.model().layoutChanged.connect(
+            self._refresh_content
+        )
         self._project = None
         self._live_edit = False
         self._live_thread = ReloadProjectThread()

@@ -59,6 +59,7 @@ class ContentNode(Node):
         self._parent = parent
         self._row = row
         self._children = None
+        self._history = []
 
     @property
     def parent(self):
@@ -74,6 +75,7 @@ class ContentNode(Node):
             for i, content in enumerate(self.content.target_panel.content):
                 children.append(ContentNode(content, self, i))
         self._children = children
+        self._history += children
         return children
 
     @property
@@ -96,15 +98,18 @@ class ContentNode(Node):
 
     def add_child(self, child):
         if isinstance(self.content, PanelContent):
-            panel = self.content.panel
+            panel = self.content.target_panel
             if isinstance(child, ContentNode):
-                child.content.target_panel = panel
+                child.content.panel = panel
 
+            child.parent._children = None
+            self._children = None
         return
 
     def remove_child(self, child):
         """remove the child
         """
+        self._children = None
 
 
 class PanelNode(Node):
@@ -117,6 +122,7 @@ class PanelNode(Node):
         self._parent = parent
         self._row = row
         self._children = None
+        self._history = []
 
     @property
     def row(self):
@@ -143,6 +149,7 @@ class PanelNode(Node):
         for i, content in enumerate(self._panel.content):
             content_node = ContentNode(content, self, i)
             children.append(content_node)
+        self._history += children
         self._children = children
 
         return children
@@ -150,6 +157,14 @@ class PanelNode(Node):
     @property
     def type(self):
         return 'Panel'
+
+    def add_child(self, child):
+
+        if isinstance(child, ContentNode):
+            child.content.panel = self._panel
+
+        child.parent._children = None
+        self._children = None
 
 
 class ProjectNode(Node):
@@ -160,6 +175,7 @@ class ProjectNode(Node):
         super(ProjectNode, self).__init__()
         self._project = project
         self._children = None
+        self._history = []
 
     @property
     def children(self):
@@ -177,6 +193,7 @@ class ProjectNode(Node):
             panel_node = PanelNode(panel, self, i)
             children.append(panel_node)
         self._children = children
+        self._history += children
         return children
 
     @property
@@ -290,7 +307,7 @@ class PanelsModel(qtcore.QAbstractItemModel):
     def supportedDropActions(self):
         """which drops do we support
         """
-        return qtcore.Qt.CopyAction | qtcore.Qt.MoveAction
+        return qtcore.Qt.MoveAction
 
     def flags(self, index):
         """default flags
@@ -307,6 +324,12 @@ class PanelsModel(qtcore.QAbstractItemModel):
         """handle drop mime data
         """
         if data.hasFormat('application/x-tree-node'):
+            if parent.isValid():
+                parent_node = parent.internalPointer()
+                if isinstance(parent_node, ContentNode):
+                    if isinstance(parent_node.content, ActionContent):
+                        return False
+
             guids = str(data.data('application/x-tree-node')).split(',')
             nodes = []
 
@@ -320,16 +343,22 @@ class PanelsModel(qtcore.QAbstractItemModel):
             if parent.isValid():
                 parent_node = parent.internalPointer()
                 for node in nodes:
-                    if node.parent:
-                        node.parent.remove_child(node)
-
                     parent_node.add_child(node)
+
+                self.layoutAboutToBeChanged.emit()
+                self.layoutChanged.emit()
 
         return True
 
     def canDropMimeData(self, data, action, row, column, parent):
         """check if it can drop
         """
+        if parent.isValid():
+            parent_node = parent.internalPointer()
+            if isinstance(parent_node, ContentNode):
+                if isinstance(parent_node.content, ActionContent):
+                    return False
+
         return True
 
     def mimeData(self, indexes):
@@ -361,3 +390,4 @@ class PanelsTreeWidget(qtgui.QTreeView):
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
         self.setSelectionMode(self.ExtendedSelection)
+        self.setColumnWidth(0, 800)
