@@ -190,6 +190,9 @@ class ProjectNode(Node):
         children = []
 
         for i, panel in enumerate(self._project.panels):
+            if not panel.is_main_panel:
+                continue
+
             panel_node = PanelNode(panel, self, i)
             children.append(panel_node)
         self._children = children

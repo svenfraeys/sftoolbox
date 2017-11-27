@@ -162,6 +162,9 @@ def load_project_from_filepath(filepath):
         elif isinstance(main_panel, dict):
             main_panel.setdefault('idname', 'main')
 
+        if 'is_main_panel' not in main_panel:
+            main_panel['is_main_panel'] = True
+
         panels.insert(0, main_panel)
 
     if panels and not project.active_panel_idname:
